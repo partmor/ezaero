@@ -62,7 +62,7 @@ import mpl_toolkits.mplot3d as a3
 import matplotlib.colors as colors
 from mpl_toolkits.mplot3d import Axes3D
 
-def plot_wing_panels(X,Y,Z):
+def plot_wing_panels(X,Y,Z,elev=25,azim=10):
     m = X.shape[0]
     n = X.shape[1]
     bp = Y.max()*2
@@ -81,5 +81,5 @@ def plot_wing_panels(X,Y,Z):
     ax.set_xlabel('x')
     ax.set_ylabel('y')
     ax.set_zlabel('z')
-    ax.view_init(elev=25, azim=10)
-    plt.show()
+    ax.view_init(elev=elev, azim=azim)
+    return ax
