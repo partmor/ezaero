@@ -33,6 +33,7 @@ def panel_geo(bp, T, delta, c_r, c_t, m, n, i, j):
     dx_PC = c_PC/m
     x_A = (r - c_AC/4) + i*dx_AC
     x_B = (s - c_BD/4) + i*dx_BD
+    
     x_pc = (q - c_PC/4) + (i + 3/4)*dx_PC
     
     # the first term in brackets in the expressions of xA, xB and XPC is the x
@@ -45,16 +46,20 @@ def panel_geo(bp, T, delta, c_r, c_t, m, n, i, j):
     y = np.array([y_A,y_B,y_D,y_C])
     z = np.tan(delta)*np.abs(y)
     
-    return x, y, z
+    z_pc = np.tan(delta)*np.abs(y_pc)
+    v_pc = np.array([x_pc,y_pc,z_pc])
+    
+    return x, y, z, v_pc
 
 def wing_panels(bp, T, delta, c_r, c_t, m, n):
     X = np.empty((m,n,4))
     Y = np.empty((m,n,4))
     Z = np.empty((m,n,4))
+    PC = np.empty((m,n,3))
     for i in range(m):
         for j in range(n):
-            X[i,j,:], Y[i,j,:], Z[i,j,:] = panel_geo(bp,T,delta,c_r,c_t,m,n,i,j)
-    return X, Y, Z
+            X[i,j,:], Y[i,j,:], Z[i,j,:], PC[i,j,:] = panel_geo(bp,T,delta,c_r,c_t,m,n,i,j)
+    return X, Y, Z, PC
 
 def steady_wing_vortex_panels(X,Y,Z,U_i,dt,alpha):
     m, n, _ = X.shape
@@ -98,4 +103,8 @@ def plot_panels(X,Y,Z,elev=25,azim=-160,edge_color='k',fill_color=1,transp=0.2,a
         ax.set_ylabel('y')
         ax.set_zlabel('z')
         ax.view_init(elev=elev, azim=azim)
+    return ax
+
+def plot_control_points(PC, ax):
+    ax.scatter(xs=PC[:,:,0].ravel(),ys=PC[:,:,1].ravel(),zs=PC[:,:,2].ravel())
     return ax
