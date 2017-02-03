@@ -1,6 +1,6 @@
 import numpy as np
 
-def flat_panel_geo(bp, T, delta, c_r, c_t, m, n, i, j):
+def panel_geo(bp, T, delta, c_r, c_t, m, n, i, j):
     dy = bp/n
     
     # A-B=forward segment
@@ -47,14 +47,28 @@ def flat_panel_geo(bp, T, delta, c_r, c_t, m, n, i, j):
     
     return x, y, z
 
-def wing_panel_geo(bp, T, delta, c_r, c_t, m, n):
+def wing_panels(bp, T, delta, c_r, c_t, m, n):
     X = np.empty((m,n,4))
     Y = np.empty((m,n,4))
     Z = np.empty((m,n,4))
     for i in range(m):
         for j in range(n):
-            X[i,j,:], Y[i,j,:], Z[i,j,:] = flat_panel_geo(bp,T,delta,c_r,c_t,m,n,i,j)
+            X[i,j,:], Y[i,j,:], Z[i,j,:] = panel_geo(bp,T,delta,c_r,c_t,m,n,i,j)
     return X, Y, Z
+
+def steady_wing_vortex_panels(X,Y,Z,U_i,dt,alpha):
+    m, n, _ = X.shape
+    dxv = (X[:,:,[3,2,2,3]] - X[:,:,[0,1,1,0]])/4
+    dxv[m-1,:,2:] = 0.3*U_i*dt*np.cos(alpha)
+    XV = X + dxv
+    
+    YV = Y
+    
+    ZV = np.empty((m,n,4))
+    ZV[:,:,[0,1]] = Z[:,:,[0,1]] + 1/4*(Z[:,:,[3,2]] - Z[:,:,[0,1]])
+    ZV[:,:,[3,2]] = Z[:,:,[0,1]] + 5/4*(Z[:,:,[3,2]] - Z[:,:,[0,1]])
+    
+    return XV,YV,ZV
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -62,24 +76,26 @@ import mpl_toolkits.mplot3d as a3
 import matplotlib.colors as colors
 from mpl_toolkits.mplot3d import Axes3D
 
-def plot_wing_panels(X,Y,Z,elev=25,azim=10):
-    m = X.shape[0]
-    n = X.shape[1]
+def plot_panels(X,Y,Z,elev=25,azim=-160,edge_color='k',fill_color=1,transp=0.2,ax=None):
+    m, n, _ = X.shape
     bp = Y.max()*2
-    ax = a3.Axes3D(plt.figure())
+    new_ax = not ax
+    if new_ax:
+        ax = a3.Axes3D(plt.figure())
     for i in range(m):
         for j in range(n):
             vtx = np.array([X[i,j],Y[i,j],Z[i,j]]).T
             panel = a3.art3d.Poly3DCollection([vtx])
-            panel.set_color('w')
-            panel.set_edgecolor('k')
+            panel.set_facecolor((0, 0, fill_color, transp))
+            panel.set_edgecolor(edge_color)
             ax.add_collection3d(panel)
-    limits = (-bp/1.7,bp/1.7)
-    ax.set_xlim(limits)
-    ax.set_ylim(limits)
-    ax.set_zlim(limits)
-    ax.set_xlabel('x')
-    ax.set_ylabel('y')
-    ax.set_zlabel('z')
-    ax.view_init(elev=elev, azim=azim)
+    if new_ax:
+        limits = (-bp/1.8,bp/1.8)
+        ax.set_xlim(limits)
+        ax.set_ylim(limits)
+        ax.set_zlim(limits)
+        ax.set_xlabel('x')
+        ax.set_ylabel('y')
+        ax.set_zlabel('z')
+        ax.view_init(elev=elev, azim=azim)
     return ax
