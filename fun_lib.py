@@ -49,20 +49,21 @@ def panel_geo(bp, T, delta, c_r, c_t, m, n, i, j):
     z_pc = np.tan(delta)*np.abs(y_pc)
     v_pc = np.array([x_pc,y_pc,z_pc])
     
-    return x, y, z, v_pc
+    return np.vstack((x,y,z)).T, v_pc
 
 def wing_panels(bp, T, delta, c_r, c_t, m, n):
-    X = np.empty((m,n,4))
-    Y = np.empty((m,n,4))
-    Z = np.empty((m,n,4))
+    X = np.empty((m,n,4,3))
     PC = np.empty((m,n,3))
     for i in range(m):
         for j in range(n):
-            X[i,j,:], Y[i,j,:], Z[i,j,:], PC[i,j,:] = panel_geo(bp,T,delta,c_r,c_t,m,n,i,j)
-    return X, Y, Z, PC
+            X[i,j], PC[i,j] = panel_geo(bp,T,delta,c_r,c_t,m,n,i,j)
+    return X, PC
 
-def steady_wing_vortex_panels(X,Y,Z,U_i,dt,alpha):
-    m, n, _ = X.shape
+def steady_wing_vortex_panels(X_coord,U_i,dt,alpha):
+    X = X_coord[:,:,:,0]
+    Y = X_coord[:,:,:,1]
+    Z = X_coord[:,:,:,2]
+    m, n, _, _ = X_coord.shape
     dxv = (X[:,:,[3,2,2,3]] - X[:,:,[0,1,1,0]])/4
     dxv[m-1,:,2:] = 0.3*U_i*dt*np.cos(alpha)
     XV = X + dxv
@@ -73,7 +74,7 @@ def steady_wing_vortex_panels(X,Y,Z,U_i,dt,alpha):
     ZV[:,:,[0,1]] = Z[:,:,[0,1]] + 1/4*(Z[:,:,[3,2]] - Z[:,:,[0,1]])
     ZV[:,:,[3,2]] = Z[:,:,[0,1]] + 5/4*(Z[:,:,[3,2]] - Z[:,:,[0,1]])
     
-    return XV,YV,ZV
+    return np.stack([XV,YV,ZV],axis=3)
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -81,8 +82,11 @@ import mpl_toolkits.mplot3d as a3
 import matplotlib.colors as colors
 from mpl_toolkits.mplot3d import Axes3D
 
-def plot_panels(X,Y,Z,elev=25,azim=-160,edge_color='k',fill_color=1,transp=0.2,ax=None):
-    m, n, _ = X.shape
+def plot_panels(X_coord,elev=25,azim=-160,edge_color='k',fill_color=1,transp=0.2,ax=None):
+    X = X_coord[:,:,:,0]
+    Y = X_coord[:,:,:,1]
+    Z = X_coord[:,:,:,2]
+    m, n, _, _ = X_coord.shape
     bp = Y.max()*2
     new_ax = not ax
     if new_ax:
