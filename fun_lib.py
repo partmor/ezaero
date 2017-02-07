@@ -76,6 +76,59 @@ def steady_wing_vortex_panels(X_coord,U_i,dt,alpha):
     
     return np.stack([XV,YV,ZV],axis=3)
 
+def panel_on_pc_induced_velocity(PC,X,G=1):
+    norm = lambda x: np.linalg.norm(x,ord=2,axis=1).reshape(-1,1)
+    r1 = X - PC
+    r2 = np.roll(r1, shift=-1, axis=0)
+    
+    cp = np.cross(r1,r2)
+    
+    d1 = r2 - r1
+    d2 = r1/norm(r1) - r2/norm(r2)
+    
+    return (-G/(4*np.pi)*cp/(norm(cp)**2)*np.einsum('ij,ij->i', d1, d2).reshape(-1,1)).sum(axis=0)
+
+def panel_normal_vectors(X):
+    m = X.shape[0]
+    d1 = X[:,:,2] - X[:,:,0]
+    d2 = X[:,:,1] - X[:,:,3]
+    nv = np.cross(d1,d2)
+    return nv / np.linalg.norm(nv,ord=2,axis=2).reshape(m,-1,1)
+
+def wing_influence_matrix(X,PC):
+    m, n = X.shape[:2]
+    X_r = X.reshape(m*n,4,3)
+    PC_r = PC.reshape(m*n,3)
+    aic = np.empty((m*n,m*n))
+    nv = panel_normal_vectors(X).reshape(m*n,3)
+    for r in range(m*n):
+        for s in range(m*n):
+            aic[r,s] = np.dot(panel_on_pc_induced_velocity(X_r[s],PC_r[r]),nv[r])
+    return aic
+
+def steady_wake(X,alpha,nb=30):
+    m, n = X.shape[:2]
+    bp = X[:,:,1].max()*2
+    X_wake = np.empty((n,4,3))
+    for j in range(n):
+        X_wake[j,[0,1]] = X[m-1,j,[3,2]]
+        X_wake[j,[3,2]] = X[m-1,j,[3,2]] + nb*bp*np.array([np.cos(alpha),0,np.sin(alpha)])
+    return X_wake
+
+def wake_contrib_to_wing_influence_matrix(X,PC,alpha):
+    m, n = X.shape[:2]
+    aic_w = np.zeros((m*n,m*n))
+    X_r = X.reshape(m*n,4,3)
+    PC_r = PC.reshape(m*n,3)
+    nv = panel_normal_vectors(X).reshape(m*n,3)
+    X_wake = steady_wake(X,alpha)
+    for r in range(m*n):
+        count = 0
+        for s in range(m*n):
+            if s//n == m - 1:
+                aic_w[r,s] = np.dot(panel_on_pc_induced_velocity(X_wake[count],PC_r[r]),nv[r])
+    return aic_w
+
 import matplotlib
 import matplotlib.pyplot as plt
 import mpl_toolkits.mplot3d as a3
@@ -86,7 +139,7 @@ def plot_panels(X_coord,elev=25,azim=-160,edge_color='k',fill_color=1,transp=0.2
     X = X_coord[:,:,:,0]
     Y = X_coord[:,:,:,1]
     Z = X_coord[:,:,:,2]
-    m, n, _, _ = X_coord.shape
+    m, n = X_coord.shape[:2]
     bp = Y.max()*2
     new_ax = not ax
     if new_ax:
