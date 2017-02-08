@@ -76,7 +76,22 @@ def steady_wing_vortex_panels(X_coord,U_i,dt,alpha):
     
     return np.stack([XV,YV,ZV],axis=3)
 
-def panel_on_pc_induced_velocity(PC,X,G=1):
+def panel_normal_vectors(X):
+    m = X.shape[0]
+    d1 = X[:,:,2] - X[:,:,0]
+    d2 = X[:,:,1] - X[:,:,3]
+    nv = np.cross(d1,d2)
+    return nv / np.linalg.norm(nv,ord=2,axis=2).reshape(m,-1,1)
+
+###############################
+
+def steady_rhs(X,alpha,U_i):
+    m, n = X.shape[:2]
+    U = U_i*np.array([np.cos(alpha),0,np.sin(alpha)])
+    nv = panel_normal_vectors(X)
+    return -np.dot(nv.reshape(m*n,-1),U)
+
+def panel_on_pc_induced_velocity(X,PC,G=1):
     norm = lambda x: np.linalg.norm(x,ord=2,axis=1).reshape(-1,1)
     r1 = X - PC
     r2 = np.roll(r1, shift=-1, axis=0)
@@ -87,13 +102,6 @@ def panel_on_pc_induced_velocity(PC,X,G=1):
     d2 = r1/norm(r1) - r2/norm(r2)
     
     return (-G/(4*np.pi)*cp/(norm(cp)**2)*np.einsum('ij,ij->i', d1, d2).reshape(-1,1)).sum(axis=0)
-
-def panel_normal_vectors(X):
-    m = X.shape[0]
-    d1 = X[:,:,2] - X[:,:,0]
-    d2 = X[:,:,1] - X[:,:,3]
-    nv = np.cross(d1,d2)
-    return nv / np.linalg.norm(nv,ord=2,axis=2).reshape(m,-1,1)
 
 def wing_influence_matrix(X,PC):
     m, n = X.shape[:2]
@@ -123,11 +131,11 @@ def wake_contrib_to_wing_influence_matrix(X,PC,alpha):
     nv = panel_normal_vectors(X).reshape(m*n,3)
     X_wake = steady_wake(X,alpha)
     for r in range(m*n):
-        count = 0
         for s in range(m*n):
             if s//n == m - 1:
-                aic_w[r,s] = np.dot(panel_on_pc_induced_velocity(X_wake[count],PC_r[r]),nv[r])
+                aic_w[r,s] = np.dot(panel_on_pc_induced_velocity(X_wake[s%n],PC_r[r]),nv[r])
     return aic_w
+
 
 import matplotlib
 import matplotlib.pyplot as plt
