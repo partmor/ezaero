@@ -59,13 +59,13 @@ def wing_panels(bp, T, delta, c_r, c_t, m, n):
             X[i,j], PC[i,j] = panel_geo(bp,T,delta,c_r,c_t,m,n,i,j)
     return X, PC
 
-def steady_wing_vortex_panels(X_coord,U_i,dt,alpha):
+def steady_wing_vortex_panels(X_coord,U_i,alpha):
     X = X_coord[:,:,:,0]
     Y = X_coord[:,:,:,1]
     Z = X_coord[:,:,:,2]
-    m, n, _, _ = X_coord.shape
+    m, n = X_coord.shape[:2]
     dxv = (X[:,:,[3,2,2,3]] - X[:,:,[0,1,1,0]])/4
-    dxv[m-1,:,2:] = 0.3*U_i*dt*np.cos(alpha)
+    # dxv[m-1,:,2:] = 0.3*U_i*dt*np.cos(alpha)
     XV = X + dxv
     
     YV = Y
@@ -82,6 +82,15 @@ def panel_normal_vectors(X):
     d2 = X[:,:,1] - X[:,:,3]
     nv = np.cross(d1,d2)
     return nv / np.linalg.norm(nv,ord=2,axis=2).reshape(m,-1,1)
+
+def wing_planform_surface(X):
+    x = X[:,:,:,0]
+    y = X[:,:,:,1]
+	# shoelace formula to calculate flat polygon area
+    einsum_str = 'ijk,ijk->ij'
+    d1 = np.einsum(einsum_str,x,np.roll(y,1,axis=2))
+    d2 = np.einsum(einsum_str,y,np.roll(x,1,axis=2))
+    return 0.5*np.abs(d1-d2)
 
 ###############################
 
@@ -136,6 +145,16 @@ def wake_contrib_to_wing_influence_matrix(X,PC,alpha):
                 aic_w[r,s] = np.dot(panel_on_pc_induced_velocity(X_wake[s%n],PC_r[r]),nv[r])
     return aic_w
 
+def net_panel_circulation(X,PC,U_i,alpha):
+    m, n = X.shape[:2]
+    aic = wing_influence_matrix(X,PC) + wake_contrib_to_wing_influence_matrix(X,PC,alpha)
+    rhs = steady_rhs(X,alpha,U_i)
+    g = np.linalg.solve(aic,rhs).reshape(m,n)
+    
+    net_g = np.empty_like(g)
+    net_g[0,:] = g[0,:]
+    net_g[1:,:] = g[1:,:] - g[:-1,:]
+    return net_g
 
 import matplotlib
 import matplotlib.pyplot as plt
