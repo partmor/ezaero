@@ -124,7 +124,7 @@ def wing_influence_matrix(X,PC):
             aic[r,s] = np.dot(d1,nv[r])
     return aic
 
-def np_wing_influence_matrix(X,PC,G=1):
+def np_wing_influence_matrix(X,PC):
     m,n = X.shape[:2]
     r1 = X.reshape(m*n,4,3)[:,np.newaxis,:,:] - PC.reshape(m*n,3)[np.newaxis,:,np.newaxis,:]
     r2 = np.roll(r1, shift=-1, axis=2)
@@ -132,7 +132,7 @@ def np_wing_influence_matrix(X,PC,G=1):
     norm = lambda v: np.linalg.norm(v,ord=2,axis=3)[:,:,:,np.newaxis]
     d1 = r2 - r1
     d2 = r1/norm(r1) - r2/norm(r2)
-    vel = -G/(4*np.pi)*cp/(norm(cp)**2)*np.einsum('ijkl,ijkl->ijk', d1, d2)[:,:,:,np.newaxis]
+    vel = -1/(4*np.pi)*cp/(norm(cp)**2)*np.einsum('ijkl,ijkl->ijk', d1, d2)[:,:,:,np.newaxis]
     vel = vel.sum(axis=2)
     nv = panel_normal_vectors(X).reshape(m*n,3)[np.newaxis,:,:]
     return np.einsum('ijk,ijk->ij',vel,nv).T
@@ -159,9 +159,25 @@ def wake_contrib_to_wing_influence_matrix(X,PC,alpha):
                 aic_w[r,s] = np.dot(panel_on_pc_induced_velocity(X_wake[s%n],PC_r[r]),nv[r])
     return aic_w
 
+def np_wake_contrib_to_wing_influence_matrix(X,PC,alpha):
+    m,n = X.shape[:2]
+    X_wake = steady_wake(X,alpha)
+    aic_w = np.zeros((m*n,m*n))
+    r1 = X_wake[:,np.newaxis,:,:] - PC.reshape(m*n,3)[np.newaxis,:,np.newaxis,:]
+    r2 = np.roll(r1, shift=-1, axis=2)
+    cp = np.cross(r1,r2)
+    norm = lambda v: np.linalg.norm(v,ord=2,axis=3)[:,:,:,np.newaxis]
+    d1 = r2 - r1
+    d2 = r1/norm(r1) - r2/norm(r2)
+    vel = -1/(4*np.pi)*cp/(norm(cp)**2)*np.einsum('ijkl,ijkl->ijk', d1, d2)[:,:,:,np.newaxis]
+    vel = vel.sum(axis=2)
+    nv = panel_normal_vectors(X).reshape(m*n,3)
+    aic_w[:,-n:] = np.einsum('ijk,ijk->ij',vel,nv[np.newaxis,:,:]).T
+    return aic_w
+
 def net_panel_circulation(X,PC,U_i,alpha):
     m, n = X.shape[:2]
-    aic = np_wing_influence_matrix(X,PC) + wake_contrib_to_wing_influence_matrix(X,PC,alpha)
+    aic = np_wing_influence_matrix(X,PC) + np_wake_contrib_to_wing_influence_matrix(X,PC,alpha)
     rhs = steady_rhs(X,alpha,U_i)
     g = np.linalg.solve(aic,rhs).reshape(m,n)
     
