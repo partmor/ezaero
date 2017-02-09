@@ -156,11 +156,24 @@ def net_panel_circulation(X,PC,U_i,alpha):
     net_g[1:,:] = g[1:,:] - g[:-1,:]
     return net_g
 
+def aerodynamic_steady_distributions(X,PC,U_i,alpha,rho):
+    m,n = X.shape[:2]
+    bp = X[:,:,:,1].max()*2
+    net_g = net_panel_circulation(X,PC,U_i,alpha)
+    dL = net_g*rho*U_i*bp/n
+    S = wing_planform_surface(X)
+    dp = dL/S
+    cl = dp/(0.5*rho*U_i**2)
+    CLw = dL.sum()/(0.5*rho*U_i**2*S.sum())
+    cl_span = cl.sum(axis=0)/m
+    return CLw, cl, cl_span
+
 import matplotlib
 import matplotlib.pyplot as plt
 import mpl_toolkits.mplot3d as a3
 import matplotlib.colors as colors
 from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm
 
 def plot_panels(X_coord,elev=25,azim=-160,edge_color='k',fill_color=1,transp=0.2,ax=None):
     X = X_coord[:,:,:,0]
@@ -192,3 +205,23 @@ def plot_panels(X_coord,elev=25,azim=-160,edge_color='k',fill_color=1,transp=0.2
 def plot_control_points(PC, ax):
     ax.scatter(xs=PC[:,:,0].ravel(),ys=PC[:,:,1].ravel(),zs=PC[:,:,2].ravel())
     return ax
+
+def plot_spanwise_cl(PC,bp,cl_span,CLw):
+    plt.figure()
+    plt.plot(PC[0,:,1]*2/bp,cl_span/CLw)
+    plt.ylim(0,max(cl_span/CLw) + 0.2)
+    plt.xlim(0,1)
+    plt.xlabel('2y/b')
+    plt.ylabel('cl(y)/CL')
+    plt.grid()
+
+def plot_cl_distribution(PC,cl):
+    fig = plt.figure()
+    ax = a3.Axes3D(fig)
+    surf = ax.plot_surface(PC[:,:,0],PC[:,:,1],cl,cmap=cm.coolwarm,
+                           antialiased=True,shade=False,
+                           cstride=1, rstride=1)
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
+    ax.set_zlabel('cl')
+    fig.colorbar(surf, shrink=0.5, aspect=5);
