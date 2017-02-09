@@ -120,8 +120,22 @@ def wing_influence_matrix(X,PC):
     nv = panel_normal_vectors(X).reshape(m*n,3)
     for r in range(m*n):
         for s in range(m*n):
-            aic[r,s] = np.dot(panel_on_pc_induced_velocity(X_r[s],PC_r[r]),nv[r])
+            d1 = panel_on_pc_induced_velocity(X_r[s],PC_r[r])
+            aic[r,s] = np.dot(d1,nv[r])
     return aic
+
+def np_wing_influence_matrix(X,PC,G=1):
+    m,n = X.shape[:2]
+    r1 = X.reshape(m*n,4,3)[:,np.newaxis,:,:] - PC.reshape(m*n,3)[np.newaxis,:,np.newaxis,:]
+    r2 = np.roll(r1, shift=-1, axis=2)
+    cp = np.cross(r1,r2)
+    norm = lambda v: np.linalg.norm(v,ord=2,axis=3)[:,:,:,np.newaxis]
+    d1 = r2 - r1
+    d2 = r1/norm(r1) - r2/norm(r2)
+    vel = -G/(4*np.pi)*cp/(norm(cp)**2)*np.einsum('ijkl,ijkl->ijk', d1, d2)[:,:,:,np.newaxis]
+    vel = vel.sum(axis=2)
+    nv = panel_normal_vectors(X).reshape(m*n,3)[np.newaxis,:,:]
+    return np.einsum('ijk,ijk->ij',vel,nv).T
 
 def steady_wake(X,alpha,nb=30):
     m, n = X.shape[:2]
@@ -147,7 +161,7 @@ def wake_contrib_to_wing_influence_matrix(X,PC,alpha):
 
 def net_panel_circulation(X,PC,U_i,alpha):
     m, n = X.shape[:2]
-    aic = wing_influence_matrix(X,PC) + wake_contrib_to_wing_influence_matrix(X,PC,alpha)
+    aic = np_wing_influence_matrix(X,PC) + wake_contrib_to_wing_influence_matrix(X,PC,alpha)
     rhs = steady_rhs(X,alpha,U_i)
     g = np.linalg.solve(aic,rhs).reshape(m,n)
     
