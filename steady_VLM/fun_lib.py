@@ -59,7 +59,7 @@ def wing_panels(bp, T, delta, c_r, c_t, m, n):
             X[i,j], PC[i,j] = panel_geo(bp,T,delta,c_r,c_t,m,n,i,j)
     return X, PC
 
-def steady_wing_vortex_panels(X_coord,U_i,alpha):
+def steady_wing_vortex_panels(X_coord,alpha):
     X = X_coord[:,:,:,0]
     Y = X_coord[:,:,:,1]
     Z = X_coord[:,:,:,2]
@@ -100,9 +100,9 @@ def steady_rhs(X,alpha,U_i):
     nv = panel_normal_vectors(X)
     return -np.dot(nv.reshape(m*n,-1),U)
 
-def panel_on_pc_induced_velocity(X,PC,G=1):
+def panel_on_pc_induced_velocity(XV,PC,G=1):
     norm = lambda x: np.linalg.norm(x,ord=2,axis=1).reshape(-1,1)
-    r1 = X - PC
+    r1 = XV - PC
     r2 = np.roll(r1, shift=-1, axis=0)
     
     cp = np.cross(r1,r2)
@@ -112,9 +112,9 @@ def panel_on_pc_induced_velocity(X,PC,G=1):
     
     return (-G/(4*np.pi)*cp/(norm(cp)**2)*np.einsum('ij,ij->i', d1, d2).reshape(-1,1)).sum(axis=0)
 
-def wing_influence_matrix(X,PC):
+def wing_influence_matrix(X,XV,PC):
     m, n = X.shape[:2]
-    X_r = X.reshape(m*n,4,3)
+    X_r = XV.reshape(m*n,4,3)
     PC_r = PC.reshape(m*n,3)
     aic = np.empty((m*n,m*n))
     nv = panel_normal_vectors(X).reshape(m*n,3)
@@ -124,9 +124,9 @@ def wing_influence_matrix(X,PC):
             aic[r,s] = np.dot(d1,nv[r])
     return aic
 
-def np_wing_influence_matrix(X,PC):
+def np_wing_influence_matrix(X,XV,PC):
     m,n = X.shape[:2]
-    r1 = X.reshape(m*n,4,3)[:,np.newaxis,:,:] - PC.reshape(m*n,3)[np.newaxis,:,np.newaxis,:]
+    r1 = XV.reshape(m*n,4,3)[:,np.newaxis,:,:] - PC.reshape(m*n,3)[np.newaxis,:,np.newaxis,:]
     r2 = np.roll(r1, shift=-1, axis=2)
     cp = np.cross(r1,r2)
     norm = lambda v: np.linalg.norm(v,ord=2,axis=3)[:,:,:,np.newaxis]
@@ -137,31 +137,31 @@ def np_wing_influence_matrix(X,PC):
     nv = panel_normal_vectors(X).reshape(m*n,3)[np.newaxis,:,:]
     return np.einsum('ijk,ijk->ij',vel,nv).T
 
-def steady_wake(X,alpha,nb=30):
-    m, n = X.shape[:2]
-    bp = X[:,:,1].max()*2
+def steady_wake(XV,alpha,nb=300):
+    m, n = XV.shape[:2]
+    bp = XV[:,:,1].max()*2
     X_wake = np.empty((n,4,3))
     for j in range(n):
-        X_wake[j,[0,1]] = X[m-1,j,[3,2]]
-        X_wake[j,[3,2]] = X[m-1,j,[3,2]] + nb*bp*np.array([np.cos(alpha),0,np.sin(alpha)])
+        X_wake[j,[0,1]] = XV[m-1,j,[3,2]]
+        X_wake[j,[3,2]] = XV[m-1,j,[3,2]] + nb*bp*np.array([np.cos(alpha),0,np.sin(alpha)])
     return X_wake
 
-def wake_contrib_to_wing_influence_matrix(X,PC,alpha):
+def wake_contrib_to_wing_influence_matrix(X,XV,PC,alpha):
     m, n = X.shape[:2]
     aic_w = np.zeros((m*n,m*n))
-    X_r = X.reshape(m*n,4,3)
+    X_r = XV.reshape(m*n,4,3)
     PC_r = PC.reshape(m*n,3)
     nv = panel_normal_vectors(X).reshape(m*n,3)
-    X_wake = steady_wake(X,alpha)
+    X_wake = steady_wake(XV,alpha)
     for r in range(m*n):
         for s in range(m*n):
             if s//n == m - 1:
                 aic_w[r,s] = np.dot(panel_on_pc_induced_velocity(X_wake[s%n],PC_r[r]),nv[r])
     return aic_w
 
-def np_wake_contrib_to_wing_influence_matrix(X,PC,alpha):
+def np_wake_contrib_to_wing_influence_matrix(X,XV,PC,alpha):
     m,n = X.shape[:2]
-    X_wake = steady_wake(X,alpha)
+    X_wake = steady_wake(XV,alpha)
     aic_w = np.zeros((m*n,m*n))
     r1 = X_wake[:,np.newaxis,:,:] - PC.reshape(m*n,3)[np.newaxis,:,np.newaxis,:]
     r2 = np.roll(r1, shift=-1, axis=2)
@@ -175,9 +175,9 @@ def np_wake_contrib_to_wing_influence_matrix(X,PC,alpha):
     aic_w[:,-n:] = np.einsum('ijk,ijk->ij',vel,nv[np.newaxis,:,:]).T
     return aic_w
 
-def net_panel_circulation(X,PC,U_i,alpha):
+def net_panel_circulation(X,XV,PC,U_i,alpha):
     m, n = X.shape[:2]
-    aic = np_wing_influence_matrix(X,PC) + np_wake_contrib_to_wing_influence_matrix(X,PC,alpha)
+    aic = np_wing_influence_matrix(X,XV,PC) + np_wake_contrib_to_wing_influence_matrix(X,XV,PC,alpha)
     rhs = steady_rhs(X,alpha,U_i)
     g = np.linalg.solve(aic,rhs).reshape(m,n)
     
@@ -186,10 +186,10 @@ def net_panel_circulation(X,PC,U_i,alpha):
     net_g[1:,:] = g[1:,:] - g[:-1,:]
     return net_g
 
-def aerodynamic_steady_distributions(X,PC,U_i,alpha,rho):
+def aerodynamic_steady_distributions(X,XV,PC,U_i,alpha,rho):
     m,n = X.shape[:2]
     bp = X[:,:,:,1].max()*2
-    net_g = net_panel_circulation(X,PC,U_i,alpha)
+    net_g = net_panel_circulation(X,XV,PC,U_i,alpha)
     dL = net_g*rho*U_i*bp/n
     S = wing_planform_surface(X)
     dp = dL/S
