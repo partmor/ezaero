@@ -13,3 +13,7 @@ I will first walk through the 3D steady VLM, then unsteady 3D VLM, and finally c
 I will be working on this occasionally as a **hobby**, so I guess my contributions will be sparse in time.
 
 If you somehow landed here, welcome. Feedback appreciated :)
+
+### Fun fact 1:
+I have managed to suppress all the for loops in the influence matrix construction (all the Biot-Savart law evaluations) and independent rhs term relying on **numpy broadcasting**, improving execution time x150 times! (compared to using the naive for loop constructions).
+*I still need to install Matlab in my PC to actualle measure the "absolute" execution time improvement*.
