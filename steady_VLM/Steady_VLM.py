@@ -137,10 +137,10 @@ class Steady_VLM:
         XV = self.XV
 
         X_wake = np.empty((n, 4, 3))
-        for j in range(n):
-            X_wake[j, [0, 1]] = XV[m - 1, j, [3, 2]]
-            X_wake[j, [3, 2]] = XV[m - 1, j, [3, 2]] + nb * \
-                bp * np.array([np.cos(alpha), 0, np.sin(alpha)])
+
+        X_wake[:, [0, 1]] = XV[m - 1][:, [3, 2]]
+        X_wake[:, [3, 2]] = XV[m - 1][:, [3, 2]] + nb * \
+            bp * np.array([np.cos(alpha), 0, np.sin(alpha)])
         self.XW = X_wake
 
     def biot_savart_aux(self, r1, G=1):
