@@ -6,7 +6,6 @@ import matplotlib.colors as colors
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
 
-
 class Steady_VLM:
 
     def set_wing_parameters(self, bp, theta, delta, c_r, c_t):
@@ -285,3 +284,35 @@ class Steady_VLM:
         self.plot_panels('XW', elev=elev, azim=azim,
                          edge_color='r', fill_color=0, ax=ax)
         self.plot_control_points(ax)
+
+    def plot_cl_distribution_on_wing(self, cmap=cm.coolwarm, elev=25, azim=-160):
+        m, n, bp = self.m, self.n, self.bp
+        X_coord = self.X
+        cl_dist = self.cl
+
+        X = X_coord[:, :, :, 0]
+        Y = X_coord[:, :, :, 1]
+        Z = X_coord[:, :, :, 2]
+        norm = plt.Normalize()
+        face_colors = cmap(norm(cl_dist))
+        fig = plt.figure()
+        ax = a3.Axes3D(fig)
+        for i in range(m):
+            for j in range(n):
+                vtx = np.array([X[i, j], Y[i, j], Z[i, j]]).T
+                panel = a3.art3d.Poly3DCollection([vtx])
+                panel.set_facecolor((face_colors[i, j][0], face_colors[
+                                    i, j][1], face_colors[i, j][2]))
+                panel.set_edgecolor('k')
+                ax.add_collection3d(panel)
+        limits = (-bp / 1.8, bp / 1.8)
+        ax.set_xlim(limits)
+        ax.set_ylim(limits)
+        ax.set_zlim(limits)
+        ax.set_xlabel('x')
+        ax.set_ylabel('y')
+        ax.set_zlabel('z')
+        ax.view_init(elev=elev, azim=azim)
+        sm = cm.ScalarMappable(norm, cmap)
+        sm.set_array(cl_dist)
+        fig.colorbar(sm, shrink=0.5, aspect=6, extend='both')
