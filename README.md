@@ -15,5 +15,7 @@ I will be working on this occasionally as a **hobby**, so I guess my contributio
 If you somehow landed here, welcome. Feedback appreciated :)
 
 ### Fun fact 1:
-I have managed to suppress all the for loops in the influence matrix construction (all the Biot-Savart law evaluations) and independent rhs term relying on **numpy broadcasting**, improving execution time x150 times! (compared to using the naive for loop constructions).
-*I still need to install Matlab in my PC to actually measure the "absolute" execution time improvement*.
+I have managed to suppress all the for loops in the influence matrix and rhs term construction (all the Biot-Savart law evaluations) relying on **numpy broadcasting**, cross and dot products with high order arrays (the latter by means of np.einsum), improving execution time around x150!, compared to using numpy with naive for loop constructions.
+
+### Milestone 1:
+The steady 3D Vortex Lattice Method module is ready and validated against the figures in *Low Speed Aerodynamics* (J. Katz et al.). Only minor improvements will be made, related to controlling the access to some attributes and methods of the class. Now I can start working on  the unsteady VLM.
