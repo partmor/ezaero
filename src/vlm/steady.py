@@ -1,9 +1,6 @@
 import numpy as np
-import matplotlib
 import matplotlib.pyplot as plt
 import mpl_toolkits.mplot3d as a3
-import matplotlib.colors as colors
-from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
 
 class Steady_VLM:
