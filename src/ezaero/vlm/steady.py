@@ -1,7 +1,90 @@
+from collections import namedtuple
+
 import numpy as np
+
 import matplotlib.pyplot as plt
 import mpl_toolkits.mplot3d as a3
 from matplotlib import cm
+
+
+WingParams = namedtuple('WingParams', 'cr, ct, bp, theta, delta')
+MeshParams = namedtuple('MeshParams', 'm, n')
+FlightConditions = namedtuple('FlightConditions', 'ui, alpha, rho')
+
+
+def get_quarter_chord_x(y, cr, theta):
+    # slope of the quarter chord line
+    p = np.tan(theta)
+    return cr / 4 + p * abs(y)
+
+
+def get_chord_at_section(y, cr, ct, bp):
+    c = cr + (ct - cr) * abs(2 * y / bp)
+    return c
+
+
+def build_panel(wing: WingParams, mesh: MeshParams, i: int, j: int):
+    """
+        ^x    C --- D
+    y   |     |     |
+    <---*     A --- B
+
+    A-B = forward segment
+    C-D = rear segment
+    Clockwise sequence: ABDC
+    """
+
+    dy = wing.bp / mesh.n
+    y_A = - wing.bp / 2 + j * dy
+    y_B = y_A + dy
+    y_C, y_D = y_A, y_B
+    y_pc = y_A + dy / 2
+
+    # chord law evaluation
+    c_AC = get_chord_at_section(y_A, cr=wing.cr, ct=wing.ct, bp=wing.bp)
+    c_BD = get_chord_at_section(y_B, cr=wing.cr, ct=wing.ct, bp=wing.bp)
+    c_pc = get_chord_at_section(y_pc, cr=wing.cr, ct=wing.ct, bp=wing.bp)
+
+    # division of the chord in m equal panels
+    dx_AC = c_AC / mesh.m
+    dx_BD = c_BD / mesh.m
+    dx_pc = c_pc / mesh.m
+
+    # r,s,q are the X coordinates of the quarter chord line at spanwise
+    # locations: y_A, y_B and y_pc respectively
+    r = get_quarter_chord_x(y_A, cr=wing.cr, theta=wing.theta)
+    s = get_quarter_chord_x(y_B, cr=wing.cr, theta=wing.theta)
+    q = get_quarter_chord_x(y_pc, cr=wing.cr, theta=wing.theta)
+
+    x_A = (r - c_AC / 4) + i * dx_AC
+    x_B = (s - c_BD / 4) + i * dx_BD
+    x_C = x_A + dx_AC
+    x_D = x_B + dx_BD
+    x_pc = (q - c_pc / 4) + (i + 3 / 4) * dx_pc
+
+    x = np.array([x_A, x_B, x_D, x_C])
+    y = np.array([y_A, y_B, y_D, y_C])
+    z = np.tan(wing.delta) * np.abs(y)
+    panel = np.stack((x, y, z), axis=-1)
+
+    z_pc = np.tan(wing.delta) * np.abs(y_pc)
+    pc = np.array([x_pc, y_pc, z_pc])
+
+    return panel, pc
+
+
+def build_wing_panels(wing: WingParams, mesh: MeshParams):
+    m, n = mesh.m, mesh.n
+
+    X = np.empty((m, n, 4, 3))
+    X_pc = np.empty((m, n, 3))
+
+    for i in range(m):
+        for j in range(n):
+            X[i, j], X_pc[i, j] = build_panel(wing, mesh, i, j)
+
+    return X, X_pc
+
 
 class Steady_VLM:
 
