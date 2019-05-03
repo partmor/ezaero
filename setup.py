@@ -8,15 +8,26 @@ from setuptools import (
     setup
 )
 
+NAME = 'ezaero'
+DESCRIPTION = 'Aerodynamics in Python.'
+URL = 'https://github.com/partmor/ezaero'
+EMAIL = 'part.morales@gmail.com'
+AUTHOR = 'Pedro Arturo Morales Maries'
+REQUIRES_PYTHON = '>=3.5'
+VERSION = '0.1.dev0'
+
+with open('README.rst') as f:
+    LONG_DESCRIPTION = f.read()
+
 setup(
-    name='ezaero',
-    version='0.1.dev',
+    name=NAME,
+    version=VERSION,
     license='MIT',
-    description='A library for simple aerodynamic computations.',
-    # TODO: long_description
-    author='Pedro Arturo Morales Maries',
-    author_email='part.morales@gmail.com',
-    # TODO url (github repo url)
+    description=DESCRIPTION,
+    long_description=LONG_DESCRIPTION,
+    author=AUTHOR,
+    author_email=EMAIL,
+    url=URL,
     packages=find_packages('src'),
     package_dir={'': 'src'},
     py_modules=[splitext(basename(path))[0] for path in glob('src/*.py')],
@@ -27,12 +38,7 @@ setup(
         # complete classifier list:
         # http://pypi.python.org/pypi?%3Aaction=list_classifiers
     ],
-    keywords=[
-        'aero',
-        'aerodynamics',
-        'aerospace',
-        'engineering'
-    ],
+    python_requires=REQUIRES_PYTHON,
     install_requires=[
         'matplotlib>=2.0',
         'numpy'
