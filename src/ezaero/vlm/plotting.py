@@ -4,9 +4,12 @@ import matplotlib.pyplot as plt
 import mpl_toolkits.mplot3d as a3
 
 
-def plot_panels(wing, mesh, X_input, elev=25, azim=-160, edge_color='k', fill_color=1, transp=0.2, ax=None):
-    m, n, bp = mesh.m, mesh.n, wing.bp
+def plot_panels(X_input, elev=25, azim=-160, edge_color='k',
+                fill_color=1, transp=0.2, ax=None):
+
+    m, n = X_input.shape[0], X_input.shape[1]
     X, Y, Z = [X_input[:, :, :, i] for i in range(3)]
+    bp = Y.max() - Y.min()
     new_ax = not ax
     if new_ax:
         ax = a3.Axes3D(plt.figure())
