@@ -4,11 +4,11 @@ import matplotlib.pyplot as plt
 import mpl_toolkits.mplot3d as a3
 
 
-def plot_panels(X_input, elev=25, azim=-160, edge_color='k',
+def plot_panels(x, elev=25, azim=-160, edge_color='k',
                 fill_color=1, transp=0.2, ax=None):
 
-    m, n = X_input.shape[0], X_input.shape[1]
-    X, Y, Z = [X_input[:, :, :, i] for i in range(3)]
+    m, n = x.shape[0], x.shape[1]
+    X, Y, Z = [x[:, :, :, i] for i in range(3)]
     bp = Y.max() - Y.min()
     new_ax = not ax
     if new_ax:
@@ -29,4 +29,13 @@ def plot_panels(X_input, elev=25, azim=-160, edge_color='k',
         ax.set_ylabel('y')
         ax.set_zlabel('z')
         ax.view_init(elev=elev, azim=azim)
+    return ax
+
+
+def plot_control_points(cpoints, ax):
+    ax.scatter(
+        xs=cpoints[:, :, 0].ravel(),
+        ys=cpoints[:, :, 1].ravel(),
+        zs=cpoints[:, :, 2].ravel()
+    )
     return ax
