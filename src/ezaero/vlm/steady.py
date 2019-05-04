@@ -23,6 +23,17 @@ def get_chord_at_section(y, cr, ct, bp):
     return c
 
 
+def double_to_single_index(i, j, n):
+    s = i * n + j
+    return s
+
+
+def single_to_double_index(s, n):
+    i = s // n
+    j = s - i * n
+    return i, j
+
+
 def build_panel(wing: WingParams, mesh: MeshParams, i: int, j: int):
     """
         ^x    C --- D
@@ -74,6 +85,11 @@ def build_panel(wing: WingParams, mesh: MeshParams, i: int, j: int):
 
 
 def build_wing_panels(wing: WingParams, mesh: MeshParams):
+    """
+    output:
+        X[spanwise ix, chordwise ix, vertex ix, dimension ix]
+        X_pc[spanwise ix, chordwise ix, dimension ix]
+    """
     m, n = mesh.m, mesh.n
 
     X = np.empty((m, n, 4, 3))
@@ -84,6 +100,28 @@ def build_wing_panels(wing: WingParams, mesh: MeshParams):
             X[i, j], X_pc[i, j] = build_panel(wing, mesh, i, j)
 
     return X, X_pc
+
+
+def build_wing_vortex_panels(mesh: MeshParams, wing_panels: np.ndarray):
+    """
+    output:
+        vortex_panelsX[spanwise ix, chordwise ix, vertex ix, dimension ix]
+    """
+    m, n = mesh.m, mesh.n
+    X, Y, Z = [wing_panels[:, :, :, i] for i in range(3)]
+
+    dxv = (X[:, :, [3, 2, 2, 3]] - X[:, :, [0, 1, 1, 0]]) / 4
+    XV = X + dxv
+
+    YV = Y
+
+    ZV = np.empty((m, n, 4))
+    dzv = Z[:, :, [3, 2]] - Z[:, :, [0, 1]]
+    ZV[:, :, [0, 1]] = Z[:, :, [0, 1]] + 1 / 4 * dzv
+    ZV[:, :, [3, 2]] = Z[:, :, [0, 1]] + 5 / 4 * dzv
+
+    vortex_panels = np.stack([XV, YV, ZV], axis=3)
+    return vortex_panels
 
 
 class Steady_VLM:
