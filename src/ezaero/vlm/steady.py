@@ -102,12 +102,12 @@ def build_wing_panels(wing: WingParams, mesh: MeshParams):
     return X, X_pc
 
 
-def build_wing_vortex_panels(mesh: MeshParams, wing_panels: np.ndarray):
+def build_wing_vortex_panels(wing_panels: np.ndarray):
     """
     output:
         vortex_panelsX[spanwise ix, chordwise ix, vertex ix, dimension ix]
     """
-    m, n = mesh.m, mesh.n
+    m, n = wing_panels.shape[:2]
     X, Y, Z = [wing_panels[:, :, :, i] for i in range(3)]
 
     dxv = (X[:, :, [3, 2, 2, 3]] - X[:, :, [0, 1, 1, 0]]) / 4
@@ -122,6 +122,30 @@ def build_wing_vortex_panels(mesh: MeshParams, wing_panels: np.ndarray):
 
     vortex_panels = np.stack([XV, YV, ZV], axis=3)
     return vortex_panels
+
+
+def get_panel_normal_vectors(wing_panels: np.ndarray):
+    m, n = wing_panels.shape[:2]
+
+    # diagonal vectors
+    d1 = wing_panels[:, :, 2] - wing_panels[:, :, 0]
+    d2 = wing_panels[:, :, 1] - wing_panels[:, :, 3]
+    nv = np.cross(d1, d2)
+
+    normal_vector = nv / np.linalg.norm(nv, ord=2, axis=2).reshape((m, n, 1))
+    return normal_vector
+
+
+def get_wing_planform_surface(wing_panels: np.ndarray):
+    x, y = [wing_panels[:, :, :, i] for i in range(2)]
+
+    # shoelace formula to calculate flat polygon area
+    einsum_str = 'ijk,ijk->ij'
+    d1 = np.einsum(einsum_str, x, np.roll(y, 1, axis=2))
+    d2 = np.einsum(einsum_str, y, np.roll(x, 1, axis=2))
+    panel_surface = 0.5 * np.abs(d1 - d2)
+
+    return panel_surface
 
 
 class Steady_VLM:
