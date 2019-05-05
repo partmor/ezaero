@@ -257,3 +257,18 @@ def get_aero_distributions(flcond: FlightConditions,
         'cl_wing': cl_wing,
         'cl_span': cl_span
     }
+
+
+def run_simulation(wing: WingParams, mesh: MeshParams,
+                   flcond: FlightConditions):
+    wing_panels, cpoints = build_wing_panels(wing, mesh)
+    vortex_panels = build_wing_vortex_panels(wing_panels)
+    normal_vectors = get_panel_normal_vectors(wing_panels)
+    surface = get_wing_planform_surface(wing_panels)
+    wake = build_steady_wake(flcond, vortex_panels)
+    aic = get_influence_matrix(vortex_panels, wake, cpoints, normal_vectors)
+    rhs = get_rhs(flcond, normal_vectors)
+    circulation = solve_net_panel_circulation_distribution(aic, rhs, mesh.m,
+                                                           mesh.n)
+    res = get_aero_distributions(flcond, wing, mesh, circulation, surface)
+    return res
