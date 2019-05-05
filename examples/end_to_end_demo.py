@@ -15,7 +15,8 @@ wing = vlm.WingParams(cr=1, ct=0.6, bp=4, theta=30 * np.pi / 180,
 mesh = vlm.MeshParams(m=4, n=16)
 flcond = vlm.FlightConditions(ui=100, alpha=1 * np.pi / 180, rho=1.0)
 
-# step by step execution of the simulation
+# step by step execution of the simulation (equivalent to running
+# the run_simulation method)
 wing_panels, cpoints = vlm.build_wing_panels(wing=wing, mesh=mesh)
 vortex_panels = vlm.build_wing_vortex_panels(wing_panels)
 normal_vectors = vlm.get_panel_normal_vectors(wing_panels)
