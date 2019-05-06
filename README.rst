@@ -1,9 +1,9 @@
 ezaero
 ======
 
-*[Under construction - see :ref:`Motivation`]*
+[Under construction - see :ref:`Motivation`]
 
-ezaero is an open source Python package oriented to implement numerical
+ezaero *(easy-aero)* is an open source Python package oriented to implement numerical
 methods for Aerodynamics, such as the 3D Vortex lattice Method for lifting surfaces.
 
 .. image:: https://github.com/partmor/ezaero/raw/master/docs/source/examples/cl_distribution.png
