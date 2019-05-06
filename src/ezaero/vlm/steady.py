@@ -18,17 +18,6 @@ def get_chord_at_section(y, cr, ct, bp):
     return c
 
 
-def double_to_single_index(i, j, n):
-    s = i * n + j
-    return s
-
-
-def single_to_double_index(s, n):
-    i = s // n
-    j = s - i * n
-    return i, j
-
-
 def build_panel(wing: WingParams, mesh: MeshParams, i: int, j: int):
     """
         ^x    C --- D
@@ -100,7 +89,7 @@ def build_wing_panels(wing: WingParams, mesh: MeshParams):
 def build_wing_vortex_panels(wing_panels: np.ndarray):
     """
     output:
-        vortex_panelsX[spanwise ix, chordwise ix, vertex ix, dimension ix]
+        vortex_panels[spanwise ix, chordwise ix, vertex ix, dimension ix]
     """
     m, n = wing_panels.shape[:2]
     X, Y, Z = [wing_panels[:, :, :, i] for i in range(3)]
