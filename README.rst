@@ -1,7 +1,7 @@
 ezaero
 ======
 
-[Under construction - see :ref:`Motivation`]
+[Under construction - see `Motivation`_]
 
 ezaero *(easy-aero)* is an open source Python package oriented to implement numerical
 methods for Aerodynamics, such as the 3D Vortex lattice Method for lifting surfaces.
