@@ -5,6 +5,7 @@ ezaero
 
 .. image:: https://github.com/partmor/ezaero/raw/master/docs/source/examples/cl_distribution.png
    :align: center
+   :scale: 50%
 
 This library is a free-time project. I am using it as an excuse to:
 
