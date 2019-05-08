@@ -1,3 +1,4 @@
+import sys
 from glob import glob
 from os.path import (
     basename,
@@ -7,6 +8,24 @@ from setuptools import (
     find_packages,
     setup
 )
+from setuptools.command.test import test as TestCommand
+
+
+class PyTest(TestCommand):
+    user_options = [("pytest-args=", "a", "Arguments to pass to pytest")]
+
+    def initialize_options(self):
+        TestCommand.initialize_options(self)
+        self.pytest_args = ""
+
+    def run_tests(self):
+        import shlex
+        # import here, because outside the eggs aren't loaded
+        import pytest
+
+        errno = pytest.main(shlex.split(self.pytest_args))
+        sys.exit(errno)
+
 
 NAME = 'ezaero'
 DESCRIPTION = 'Aerodynamics in Python.'
@@ -43,8 +62,12 @@ setup(
         'matplotlib>=2.0',
         'numpy'
     ],
+    tests_require=[
+        'pytest'
+    ],
     extras_require={
         'jupyter': ['notebook'],
         'dev': []
     },
+    cmdclass={'test': PyTest}
 )
