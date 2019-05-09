@@ -1,1 +1,4 @@
-include README.rst LICENSE
+include README.rst
+include LICENSE
+
+graft src
