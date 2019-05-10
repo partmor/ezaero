@@ -2,16 +2,15 @@ sudo: false
 language: python
 os:
   - linux
-  - osx
 matrix:
   include:
-    - python: "3.5"
+    - python: 3.5
       env:
         - TOXENV=py35
-    - python: "3.6"
+    - python: 3.6
       env:
         - TOXENV=py36
-    - python: "3.7"
+    - python: 3.7
       env:
         - TOXENV=py37
 before_install:
@@ -26,6 +25,3 @@ install:
   - tox --version
 script:
   - tox
-after_failure:
-  - more .tox/log/* | cat
-  - more .tox/*/log/* | cat
