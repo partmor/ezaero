@@ -1,0 +1,22 @@
+
+environment:
+  matrix:
+    - TOXENV: 'py36'
+      PYTHON: C:\Python36-x64\python.exe
+
+    - TOXENV: 'py37'
+      PYTHON: C:\Python37-x64\python.exe
+
+init:
+  - ps: echo $env:TOXENV
+  - ps: ls C:\Python*
+
+install:
+  - '%PYTHON% --version'
+  - "%PYTHON% -m pip install --upgrade pip"
+  - '%PYTHON% -m pip install tox'
+
+build: off
+
+test_script:
+  - '%WITH_COMPILER% %PYTHON% -m tox'
