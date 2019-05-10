@@ -1,10 +1,13 @@
 .. |travisci| image:: https://img.shields.io/travis/partmor/ezaero/master.svg?style=flat-square&logo=travis
    :target: https://travis-ci.org/partmor/ezaero
+   
+.. |appveyor| image:: https://img.shields.io/appveyor/ci/partmor/ezaero/master.svg?style=flat-square&logo=appveyor
+   :target: https://ci.appveyor.com/project/partmor/ezaero/branch/master
 
 ezaero
 ======
 
-|travisci|
+|travisci| |appveyor|
 
 [Under construction - see `Motivation`_]
 
