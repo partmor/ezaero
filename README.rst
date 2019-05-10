@@ -1,5 +1,10 @@
+.. |travisci| image:: https://img.shields.io/travis/partmor/ezaero/master.svg?style=flat-square&logo=travis
+   :target: https://travis-ci.org/partmor/ezaero
+
 ezaero
 ======
+
+|travisci|
 
 [Under construction - see `Motivation`_]
 
