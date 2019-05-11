@@ -2,10 +2,12 @@
 Step by step example of simulation execution.
 """
 import time
-import numpy as np
+
 import matplotlib.pyplot as plt
-import ezaero.vlm.steady as vlm
+import numpy as np
+
 import ezaero.vlm.plotting as plot_utils
+import ezaero.vlm.steady as vlm
 
 start = time.time()
 
