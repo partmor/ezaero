@@ -1,7 +1,17 @@
+# Notes:
+#
+# Tests for linux and osx are run together on travis
+#
+# py37 requires dist xenial to run on linux: 
+# 	https://docs.travis-ci.com/user/languages/python/#python-37-and-higher
+#
+# osx requires language generic, and only py27 and py36 are supported
+#	https://docs.travis-ci.com/user/multi-os/#python-example-unsupported-languages
+
 sudo: false
 language: python
-os:
-  - linux
+os: linux
+
 matrix:
   include:
     - python: 3.5
@@ -14,10 +24,13 @@ matrix:
       dist: xenial
       env:
         - TOXENV=py37
+    - os: osx
+      language: generic
+      env:
+        - TOXENV=py36
 before_install:
   - python --version
   - uname -a
-  - lsb_release -a
 install:
   - pip install tox
   - virtualenv --version
