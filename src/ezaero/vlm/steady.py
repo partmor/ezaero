@@ -32,15 +32,7 @@ def get_chord_at_section(y, cr, ct, bp):
 def build_panel(wing, mesh, i, j):
     """
     Construct a wing panel indexed by its chord and spanwise indices.
-
-        ^x    C --- D
-    y   |     |     |
-    <---*     A --- B
-
-    A-B = forward segment
-    C-D = rear segment
-    Clockwise sequence: ABDC
-
+    
     Parameters
     ----------
     wing : WingParams
