@@ -39,14 +39,17 @@ setup(
         'numpy'
     ],
     extras_require={
-        'jupyter': ['notebook'],
         'dev': [
             'flake8',
             'isort',
             'pytest',
             'sphinx',
-            'sphinx_rtd_theme'
+            'sphinx_rtd_theme',
             'tox'
+        ],
+        'docs': [
+            'sphinx',
+            'sphinx_rtd_theme',
         ]
     }
 )
