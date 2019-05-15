@@ -1,6 +1,13 @@
 """
+Dihedral angle effect
+=====================
+
 Effect of dihedral on the lift coefficient slope of rectangular wings.
-[From Low Speed Aerodynamics, 2nd ed, Katz et al., figure 12.21]
+
+References
+----------
+.. [1] Katz, J. et al., *Low-Speed Aerodynamics*, 2nd ed, Cambridge University
+   Press, 2001: figure 12.21
 """
 import time
 

@@ -16,3 +16,4 @@ for Aerodynamics, such as the Vortex lattice Method for lifting surfaces.
    :caption: Contents:
 
    api/vlm/steady
+   auto_examples/index

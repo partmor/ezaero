@@ -1,5 +1,8 @@
 """
-Step by step example of simulation execution.
+Detailed steady VLM demo
+========================
+
+A step by step example of simulation execution.
 """
 import time
 

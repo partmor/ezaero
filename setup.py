@@ -49,6 +49,7 @@ setup(
         ],
         'docs': [
             'sphinx',
+            'sphinx-gallery',
             'sphinx_rtd_theme',
         ]
     }

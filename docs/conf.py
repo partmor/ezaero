@@ -37,7 +37,8 @@ extensions = ['sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
     'sphinx.ext.todo',
     'sphinx.ext.mathjax',
-    'sphinx.ext.viewcode']
+    'sphinx.ext.viewcode',
+    'sphinx_gallery.gen_gallery']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -180,4 +181,10 @@ intersphinx_mapping = {
     'numpy': ('https://docs.scipy.org/doc/numpy/', None),
     'scipy': ('https://docs.scipy.org/doc/scipy/reference', None),
     'matplotlib': ('http://matplotlib.org', None)
+}
+
+
+sphinx_gallery_conf = {
+     'examples_dirs': '../examples',   # path to your example scripts
+     'gallery_dirs': 'auto_examples',  # path where to save gallery generated examples
 }

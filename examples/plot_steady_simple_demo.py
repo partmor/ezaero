@@ -1,4 +1,7 @@
 """
+Simple steady VLM demo
+======================
+
 Minimal example of simulation execution.
 """
 import time
