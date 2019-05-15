@@ -5,17 +5,72 @@ implementation for lifting surfaces.
 References
 ----------
 .. [1] Katz, J. et al., *Low-Speed Aerodynamics*, 2nd ed, Cambridge University
-   Press, 2001: chapter 12
+   Press, 2001: Chapter 12
 """
 
 from collections import namedtuple
 
 import numpy as np
 
-# TODO: write these namedtuples as playin classes, to support docstrings
-WingParams = namedtuple('WingParams', 'cr, ct, bp, theta, delta')
-MeshParams = namedtuple('MeshParams', 'm, n')
-FlightConditions = namedtuple('FlightConditions', 'ui, alpha, rho')
+
+class WingParams:
+    """
+    Container for the geometric parameters of the analyzed wing.
+
+    Attributes
+    ----------
+    cr : float
+        Chord at root of the wing.
+    ct : float
+        Chord at tip of the wing.
+    bp : float
+        Wingspan of the planform.
+    theta : float
+        Sweep angle of the 1/4 chord line, expressed in radians.
+    delta : float
+        Dihedral angle, expressed in radians.
+    """
+    def __init__(self, cr, ct, bp, theta, delta):
+        self.cr = cr
+        self.ct = ct
+        self.bp = bp
+        self.theta = theta
+        self.delta = delta
+
+
+class MeshParams:
+    """
+    Container for the wing mesh parameters.
+
+    Attributes
+    ----------
+    m : int
+        Number of chordwise panels.
+    n : int
+        Number of spanwise panels.
+    """
+    def __init__(self, m, n):
+        self.m = m
+        self.n = n
+
+
+class FlightConditions:
+    """
+    Container for the flight conditions.
+
+    Attributes
+    ----------
+    ui : float
+        Free-stream flow velocity.
+    alpha : float
+        Angle of attack of the wing, expressed in radians.
+    rho : float
+        Free-stream flow density.
+    """
+    def __init__(self, ui, alpha, rho):
+        self.ui = ui
+        self.alpha = alpha
+        self.rho = rho
 
 
 def get_quarter_chord_x(y, cr, theta):
@@ -47,10 +102,10 @@ def build_panel(wing, mesh, i, j):
     Returns
     -------
     panel : np.ndarray, shape (4, 3)
-        Array containing the (x,y,z) coordinates of the (`i`,`j`)-th panel's
+        Array containing the (x,y,z) coordinates of the (`i`, `j`)-th panel's
         vertices (sorted A-B-D-C).
     pc : np.ndarray, shape (3, )
-        (x,y,z) coordinates of the (`i`,`j`)-th panel's collocation point.
+        (x,y,z) coordinates of the (`i`, `j`)-th panel's collocation point.
     """
 
     dy = wing.bp / mesh.n
