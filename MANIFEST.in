@@ -8,4 +8,4 @@ prune examples
 prune scripts
 prune tests
 
-exclude tox.ini appveyor.yml
+exclude tox.ini appveyor.yml readthedocs.yml
