@@ -8,7 +8,6 @@ References
    Press, 2001: Chapter 12
 """
 
-from collections import namedtuple
 
 import numpy as np
 
