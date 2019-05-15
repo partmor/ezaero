@@ -6,11 +6,15 @@
 
 .. |license| image:: https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square
    :target: https://github.com/partmor/ezaero/raw/master/LICENSE
+   
+.. |docs| image:: https://img.shields.io/badge/docs-latest-brightgreen.svg?style=flat-square
+   :target: https://ezaero.readthedocs.io/en/latest/?badge=latest
+   :alt: Documentation Status
 
 ezaero
 ======
 
-|travisci| |appveyor| |license|
+|travisci| |appveyor| |docs| |license|
 
 [Under construction - see `Motivation`_]
 
