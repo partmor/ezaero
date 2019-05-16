@@ -16,14 +16,43 @@ ezaero
 
 |travisci| |appveyor| |docs| |license|
 
-[Under construction - see `Motivation`_]
-
 ezaero *(easy-aero)* is an open source Python package oriented to implement numerical
 methods for Aerodynamics, such as the 3D Vortex lattice Method for lifting surfaces.
 
 .. image:: https://github.com/partmor/ezaero/raw/master/docs/examples/cl_distribution.png
    :align: center
    :width: 200px
+
+Documentation
+-------------
+|docs|
+
+API documentation and examples can be found on https://ezaero.readthedocs.io.
+
+Examples
+--------
+
+You can check out the examples in the `gallery`_, and export them as .py scripts or Jupyter notebooks to continue exploring!
+
+.. _`gallery`: https://ezaero.readthedocs.io/en/latest/auto_examples/
+
+Requirements
+------------
+ezaero has the following dependencies:
+
+* Python (>=3.5)
+* NumPy
+* matplotlib
+
+ezaero is tested on Linux, Windows and OS X on Python 3.5, 3.6 and 3.7.
+
+==============  ============  ===================
+Platform        Site          Status
+==============  ============  ===================
+Linux           Travis CI     |travisci|
+OS X            Travis CI     |travisci|
+Windows x64     Appveyor      |appveyor|
+==============  ============  ===================
 
 Installation
 ------------
@@ -36,14 +65,21 @@ To install the package, pip install it from the repo:
 
 *[Still not available in PyPI, sorry for that!]*
 
+Contributing
+------------
+
+All contributions and suggestions are welcome! For more details, check out `CONTRIBUTING.rst`_.
+
+.. _`CONTRIBUTING.rst`: https://github.com/partmor/ezaero/blob/master/CONTRIBUTING.rst
+
 Motivation
 ----------
 
 This library is a free-time project. I am using it as an excuse to:
 
 1) Experiment the performance of several scientific computing packages and tools (NumPy, Numba, etc.) applied to a computation-intensive application.
-2) Learn how to properly test and package an open source Python library.
-3) Redo *properly* (in terms of performance optimization, SW best practices, ...) a project I enjoyed a lot during my Master Thesis, back in 2014. I was curious to know how much could I improve the code performance.
+2) Learn how to properly package an open source Python library, leveraging testing with the excelent free CI tools.
+3) Redo *properly* (in terms of performance optimization, SW best practices, ...) a project I enjoyed a lot during my Master Thesis, back in 2014. I have always been curious to know how much could I improve the code performance.
 
 
 My thesis covered the analysis of the aeroelastic response of an UAV in a gust scenario.
