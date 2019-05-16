@@ -28,9 +28,6 @@ files and proceed in the same way as with `code writing`_.
 The Python classes and methods also feature inline docs: if you detect
 any inconsistency or opportunity for improvement, you can edit those too.
 
-Besides, the `wiki`_ is open for everybody to edit, so feel free to add
-new content.
-
 To build the docs, you must first create a development environment (see
 below) and then in the ``docs/`` directory run::
 
