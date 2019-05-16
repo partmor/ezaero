@@ -4,7 +4,7 @@ Contributing
 For now ezero is a free-time project for me, hence all contributions are more than
 welcome!
 
-*[Section shamelessly copied and adapted from `Poliastro`_]*
+[Section shamelessly copied and adapted from `Poliastro`_]
 
 .. _`Poliastro`: https://github.com/poliastro/poliastro
 
