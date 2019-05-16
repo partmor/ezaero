@@ -70,4 +70,5 @@ def plot_cl_distribution_on_wing(wing_panels, res, cmap=cm.coolwarm, elev=25,
     ax.view_init(elev=elev, azim=azim)
     sm = cm.ScalarMappable(norm, cmap)
     sm.set_array(cl_dist)
-    fig.colorbar(sm, shrink=0.5, aspect=6, extend='both')
+    cbar = fig.colorbar(sm, shrink=0.5, aspect=6, extend='both')
+    cbar.ax.set_xlabel(r'C$_{L_{wing}}$')
