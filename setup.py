@@ -43,8 +43,7 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: Implementation :: CPython',
         'Topic :: Scientific/Engineering',
-        'Topic :: Scientific/Engineering :: Physics',
-        'Topic :: Scientific/Engineering :: Aerodynamics'
+        'Topic :: Scientific/Engineering :: Physics'
     ],
     python_requires=REQUIRES_PYTHON,
     install_requires=[
