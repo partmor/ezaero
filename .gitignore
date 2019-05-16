@@ -75,3 +75,7 @@ ENV/
 # IDEs
 .spyderproject
 .idea/
+
+# Sphinx-gallery
+docs/auto_examples/
+
