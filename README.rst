@@ -57,13 +57,12 @@ Windows x64     Appveyor      |appveyor|
 Installation
 ------------
 
-To install the package, pip install it from the repo:
+To install the package, simply use pip:
 
 .. code-block::
 
-    $ pip install git+https://github.com/partmor/ezaero.git
+    $ pip install ezaero
 
-*[Still not available in PyPI, sorry for that!]*
 
 Contributing
 ------------
