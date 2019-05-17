@@ -1,7 +1,7 @@
 Contributing
 ============
 
-For now ezero is a free-time project for me, hence all contributions are more than
+For now, ezero is a personal free-time project and is still very small, hence all contributions are more than
 welcome!
 
 [Section shamelessly copied and adapted from `Poliastro`_]
@@ -29,7 +29,7 @@ The Python classes and methods also feature inline docs: if you detect
 any inconsistency or opportunity for improvement, you can edit those too.
 
 To build the docs, you must first create a development environment (see
-below) and then in the ``docs/`` directory run::
+below) and then in the ``docs/`` directory run the build command::
 
     $ cd docs
     $ make html
@@ -90,8 +90,8 @@ These are some succint steps to set up a development environment:
    :code:`pip install --editable /path/to/ezaero/[dev]` (this means that the
    installed code will change as soon as you change it in the download
    location).
-6. Run `tox -e check` to check all the formatting is right.
-7. Run `pytest` to check all the functional tests pass.
+6. Run :code:`tox -e check` to check all the formatting is right.
+7. Run :code:`pytest` to check all the functional tests pass.
 8. Create a new branch.
 9. Make changes and commit.
 10. `Push to your fork <https://help.github.com/articles/pushing-to-a-remote/>`_.
