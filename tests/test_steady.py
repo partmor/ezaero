@@ -19,9 +19,8 @@ def test_cl_for_infinite_wing(alpha):
         mesh=INFINITE_WING['mesh'],
         flcond=flcond
     )
-    cl = sim['cl_wing']
 
-    assert cl == pytest.approx(2 * np.pi * alpha, rel=5e-3)
+    assert sim.cl_wing == pytest.approx(2 * np.pi * alpha, rel=5e-3)
 
 
 def test_cl_slope_for_infinite_wing():
@@ -34,7 +33,7 @@ def test_cl_slope_for_infinite_wing():
             mesh=INFINITE_WING['mesh'],
             flcond=flcond
         )
-        cls.append(sim['cl_wing'])
+        cls.append(sim.cl_wing)
 
     slope = (cls[1] - cls[0]) / (alphas[1] - alphas[0])
 

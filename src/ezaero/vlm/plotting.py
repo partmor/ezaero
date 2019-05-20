@@ -45,7 +45,7 @@ def plot_cl_distribution_on_wing(wing_panels, res, cmap=cm.coolwarm, elev=25,
                                  azim=-160):
     m, n = wing_panels.shape[:2]
     bp = wing_panels[:, :, :, 1].max() - wing_panels[:, :, :, 1].min()
-    cl_dist = res['cl']
+    cl_dist = res.cl
 
     X, Y, Z = [wing_panels[:, :, :, i] for i in range(3)]
     norm = plt.Normalize()

@@ -23,4 +23,4 @@ res = vlm.run_simulation(wing=wing, mesh=mesh, flcond=flcond)
 
 print('Elapsed time: {} s'.format(time.time() - start))
 
-print('Wing lift coefficient: {}'.format(res['cl_wing']))
+print('Wing lift coefficient: {}'.format(res.cl_wing))

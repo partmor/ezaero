@@ -245,8 +245,8 @@ def calculate_wing_planform_surface(wing_panels):
 
     Returns
     -------
-    panel_surface : np.ndarray, shape (m, n, 3)
-        Array containing the normal vectors to all wing panels.
+    panel_surface : np.ndarray, shape (m, n)
+        Array containing the planform (projected) surface of each panel.
     """
 
     x, y = [wing_panels[:, :, :, i] for i in range(2)]
@@ -455,29 +455,84 @@ def solve_net_panel_circulation_distribution(aic, rhs, m, n):
     return net_g
 
 
-def get_aero_distributions(flcond: FlightConditions,
-                           wing: WingParams,
-                           mesh: MeshParams,
-                           net_circulation: np.ndarray,
-                           surface: np.ndarray):
+class DistributionResults:
+    """
+    Container for the resulting distributions from the steady VLM simulation.
 
+    Attributes
+    ----------
+    dp : np.ndarray, shape (m, n)
+        Distribution of pressure difference between lower and upper surfaces.
+    dL : np.ndarray, shape (m, n)
+        Lift distribution.
+    bp : np.ndarray, shape (m, n)
+        Lift coefficient distribution.
+    cl_wing : float
+        Wing lift coefficient.
+    cl_span : np.ndarray, shape (n, )
+        Spanwise lift coefficient distribution.
+    """
+    def __init__(self, dp, dL, cl, cl_wing, cl_span):
+        self.dp = dp
+        self.dL = dL
+        self.cl = cl
+        self.cl_wing = cl_wing
+        self.cl_span = cl_span
+
+
+def get_aero_distributions(flcond, wing, mesh, net_circulation, surface):
+    """
+    Calculate aerodynamic distributions and quantities from the net
+    circulation distribution.
+
+    Parameters
+    ----------
+    flcond : FlightConditions
+        Definition of the flight conditions.
+    wing : WingParams
+        Wing geometry specification.
+    mesh : MeshParams
+        Mesh geometry specification.
+    net_circulation : np.ndarray, shape (m, n)
+        Array containing net circulation for each panel.
+    surface : np.ndarray, shape (m, n)
+        Array containing the planform (projected) surface of each panel.
+
+    Returns
+    -------
+    DistributionResults
+        Object containing aerodynamic magnitudes derived from the net
+        circulation distribution.
+    """
     dL = net_circulation * flcond.rho * flcond.ui * wing.bp / mesh.n
     dp = dL / surface
     cl = dp / (0.5 * flcond.rho * flcond.ui ** 2)
     cl_wing = dL.sum() / (0.5 * flcond.rho * flcond.ui ** 2 * surface.sum())
     cl_span = cl.sum(axis=0) / mesh.m
 
-    return {
-        'dL': dL,
-        'dp': dp,
-        'cl': cl,
-        'cl_wing': cl_wing,
-        'cl_span': cl_span
-    }
+    return DistributionResults(dL=dL, dp=dp, cl=cl, cl_wing=cl_wing,
+                               cl_span=cl_span)
 
 
-def run_simulation(wing: WingParams, mesh: MeshParams,
-                   flcond: FlightConditions):
+def run_simulation(wing, mesh, flcond):
+    """
+    Run end-to-end steady VLM simulation.
+
+    Parameters
+    ----------
+    wing : WingParams
+        Wing geometry specification.
+    mesh : MeshParams
+        Mesh geometry specification.
+    flcond : FlightConditions
+        Definition of the flight conditions.
+
+    Returns
+    -------
+    DistributionResults
+        Object containing aerodynamic magnitudes result of the steady VLM
+        simulation.
+    """
 
     wing_panels, cpoints = build_wing_panels(wing=wing, mesh=mesh)
     vortex_panels = build_wing_vortex_panels(wing_panels)
@@ -494,6 +549,5 @@ def run_simulation(wing: WingParams, mesh: MeshParams,
         n=mesh.n
     )
 
-    res = get_aero_distributions(flcond=flcond, wing=wing, mesh=mesh,
-                                 net_circulation=circulation, surface=surface)
-    return res
+    return get_aero_distributions(flcond=flcond, wing=wing, mesh=mesh,
+                                  net_circulation=circulation, surface=surface)

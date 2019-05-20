@@ -36,7 +36,7 @@ for delta in deltas:
     wing = vlm.WingParams(cr=1.0, ct=1.0, bp=bp, theta=0, delta=delta)
     res_0 = vlm.run_simulation(wing=wing, mesh=mesh, flcond=flcond_0)
     res_1 = vlm.run_simulation(wing=wing, mesh=mesh, flcond=flcond_1)
-    d_cl = res_1['cl_wing'] - res_0['cl_wing']
+    d_cl = res_1.cl_wing - res_0.cl_wing
     d_alpha = flcond_1.alpha - flcond_0.alpha
     slope = d_cl / d_alpha * np.cos(delta)  # project load
     cla_list.append(slope)
