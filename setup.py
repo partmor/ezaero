@@ -9,7 +9,10 @@ URL = 'https://github.com/partmor/ezaero'
 EMAIL = 'part.morales@gmail.com'
 AUTHOR = 'Pedro Arturo Morales Maries'
 REQUIRES_PYTHON = '>=3.5'
-VERSION = '0.1.dev0'
+
+# see: https://packaging.python.org/guides/single-sourcing-package-version/
+with open('VERSION') as version_file:
+    VERSION = version_file.read().strip()
 
 with open('README.rst') as f:
     LONG_DESCRIPTION = f.read()
