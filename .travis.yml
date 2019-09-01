@@ -34,13 +34,16 @@ matrix:
       language: generic
       env:
         - TOXENV=py36
+      install:
+        - python3 --version
+        - python3 -m pip install tox
+        - tox --version
 before_install:
   - python --version
   - uname -a
 install:
   - pip install tox
   - virtualenv --version
-  - easy_install --version
   - pip --version
   - tox --version
 script:
