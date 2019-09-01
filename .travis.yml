@@ -6,7 +6,9 @@
 # 	https://docs.travis-ci.com/user/languages/python/#python-37-and-higher
 #
 # osx requires language generic, and only py27 and py36 are supported
-#	https://docs.travis-ci.com/user/multi-os/#python-example-unsupported-languages
+#	- https://docs.travis-ci.com/user/multi-os/#python-example-unsupported-languages
+#	- the default python is python2, hence osx needs it's own install commands in 
+#	  order to not to install tox under py27.
 
 sudo: false
 language: python
@@ -17,6 +19,12 @@ matrix:
     - python: 3.6
       env:
         - TOXENV=check
+    - python: 3.6
+      env:
+        - TOXENV=coverage
+      after_success:
+        - pip install codecov
+        - codecov
     - python: 3.6
       env:
         - TOXENV=docs
