@@ -14,6 +14,7 @@ init:
 install:
   - '%PYTHON% --version'
   - "%PYTHON% -m pip install --upgrade pip"
+  - "%PYTHON% -m pip install --upgrade setuptools"
   - '%PYTHON% -m pip install tox'
 
 build: off
