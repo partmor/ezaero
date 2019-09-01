@@ -11,3 +11,4 @@ prune tests
 
 exclude tox.ini appveyor.yml readthedocs.yml
 exclude CONTRIBUTING.rst
+exclude .coveragerc
