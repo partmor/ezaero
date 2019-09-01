@@ -18,11 +18,14 @@
 .. |pyversions| image:: https://img.shields.io/pypi/pyversions/ezaero.svg
    :target: https://pypi.org/project/ezaero/
    :alt: Python versions
+   
+.. |codecov| image:: https://img.shields.io/codecov/c/github/partmor/ezaero.svg?style=flat-square
+   :target: https://codecov.io/github/partmor/ezaero?branch=master
 
 ezaero
 ======
 
-|travisci| |appveyor| |docs| |license| |pypi_v| |pyversions| 
+|travisci| |appveyor| |codecov| |docs| |license| |pypi_v| |pyversions| 
 
 ezaero *(easy-aero)* is an open source Python package oriented to implement numerical
 methods for Aerodynamics, such as the 3D Vortex lattice Method for lifting surfaces.
